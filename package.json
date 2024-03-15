@@ -1,0 +1,16 @@
+{
+    "type": "module",
+    "scripts": {
+        "start": "node src/main.js"
+    },
+    "dependencies": {
+        "axios": "^1.4.0",
+        "cron": "^2.2.0",
+        "discord.js": "^14.14.1",
+        "dotenv": "^16.0.3",
+        "fast-glob": "^3.2.12",
+        "mongodb": "^5.1.0",
+        "rss-parser": "^3.13.0",
+        "winston": "^3.10.0"
+    }
+}
