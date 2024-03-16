@@ -10,6 +10,11 @@ export const event = {
 export const action = async (c) => {
     const files = await fg("./src/jobs/**.js");
 
+    if (process.env.NODE_ENV === "development") {
+        logger.info("Development mode detected, skipping job loading...");
+        return;
+    }
+
     logger.info(`Loading ${files.length} jobs...`);
     for (const file of files) {
         const jobFile = await import("../../" + file);

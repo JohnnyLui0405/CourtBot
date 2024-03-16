@@ -1,5 +1,9 @@
 {
     "type": "module",
+    "sourceType": "module",
+    "name": "court-bot",
+    "version": "1.0.0",
+    "main": "src/main.js",
     "scripts": {
         "start": "node src/main.js"
     },
@@ -12,5 +16,8 @@
         "mongodb": "^5.1.0",
         "rss-parser": "^3.13.0",
         "winston": "^3.10.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.57.0"
     }
 }
