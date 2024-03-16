@@ -1,13 +1,20 @@
-import { Events, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { Events, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionResponse, BaseInteraction } from "discord.js";
+import { logger } from "../utils/logger.js";
 
 export const event = {
     name: Events.InteractionCreate,
 };
 
+/**
+ *
+ * @param {BaseInteraction} interaction
+ */
 export const action = async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
     const client = interaction.client;
-    const action = client.commands.get(interaction.commandName);
+    const execute = client.commands.get(interaction.commandName);
 
-    await action(interaction);
+    logger.info(`${interaction.member.displayName}(${interaction.member.id}) Executing command ${interaction.commandName}`);
+
+    await execute(interaction);
 };

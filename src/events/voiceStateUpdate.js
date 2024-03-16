@@ -35,7 +35,7 @@ const levelUpEmbed = (member, level) => {
 };
 
 const levelUp = (level, voiceDuration) => {
-    const requiredXp = (++level / 0.7) ** 2;
+    const requiredXp = Math.floor((++level / 0.7) ** 2);
     logger.debug("requiredXp: " + requiredXp + "");
     if (voiceDuration >= requiredXp) {
         const newLevel = Math.floor(0.7 * Math.sqrt(voiceDuration));

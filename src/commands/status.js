@@ -1,4 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder, userMention } from "discord.js";
+import { logger } from "../utils/logger.js";
 
 export const command = new SlashCommandBuilder()
     .setName("status")
@@ -16,6 +17,10 @@ export const action = async (ctx) => {
         await userCollection.insertOne({ _id: user.id.toString(), username: user.username, level: 0, xp: 0, voiceTime: 0 });
     }
 
+    const requiredXp = Math.floor(((userData.level + 1) / 0.7) ** 2);
+
+    logger.debug("requiredXp: " + requiredXp);
+
     const embed = new EmbedBuilder();
     embed.setTitle("狀態");
     embed.setThumbnail(user.displayAvatarURL());
@@ -23,7 +28,7 @@ export const action = async (ctx) => {
     embed.addFields(
         { name: "📛名稱", value: userMention(user.id), inline: true },
         { name: "🎚️等級", value: userData.level.toString(), inline: true },
-        { name: "🆙升級進度(分鐘)", value: `${userData.voiceDuration}/30` },
+        { name: "🆙升級進度(分鐘)", value: `${userData.voiceDuration}/${requiredXp}` },
         { name: "⌛語音時數", value: userData.voiceDuration.toString() + "分鐘" }
     );
 
