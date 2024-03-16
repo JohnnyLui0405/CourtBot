@@ -1,10 +1,5 @@
 import { CronJob } from "cron";
-import axios from "axios";
-import { EmbedBuilder } from "discord.js";
-import { db } from "../utils/mongodb.js";
 import { logger } from "../utils/logger.js";
-import Parser from "rss-parser";
-const parser = new Parser();
 
 export const job = {
     name: "waterReminder",

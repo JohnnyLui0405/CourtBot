@@ -15,8 +15,8 @@ loadCommands(client);
 
 client.mongoClient = mongoClient;
 
-await client.mongoClient.connect().then(() => {
+client.mongoClient.connect().then(() => {
     logger.info("Connected to MongoDB");
 });
 
-await client.login(process.env.TOKEN);
+client.login(process.env.TOKEN);

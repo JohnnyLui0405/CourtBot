@@ -1,5 +1,4 @@
 import { CronJob } from "cron";
-import axios from "axios";
 import { EmbedBuilder } from "discord.js";
 import { db } from "../utils/mongodb.js";
 import { logger } from "../utils/logger.js";

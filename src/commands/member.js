@@ -1,4 +1,4 @@
-import { EmbedBuilder, SlashCommandBuilder, userMention, ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 
 export const command = new SlashCommandBuilder().setName("getmember").setDescription("test");
 

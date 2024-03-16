@@ -5,7 +5,9 @@
     "version": "1.0.0",
     "main": "src/main.js",
     "scripts": {
-        "start": "node src/main.js"
+        "start": "node src/main.js",
+        "dev": "nodemon src/main.js",
+        "lint": "eslint ."
     },
     "dependencies": {
         "axios": "^1.4.0",

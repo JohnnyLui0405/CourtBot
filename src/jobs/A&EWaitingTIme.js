@@ -1,7 +1,6 @@
 import { CronJob } from "cron";
 import axios from "axios";
 import { EmbedBuilder } from "discord.js";
-import { db } from "../utils/mongodb.js";
 import { logger } from "../utils/logger.js";
 
 export const job = {
@@ -15,7 +14,7 @@ export const action = async (client) => {
         const waitTimeData = res.data.waitTime;
         logger.debug(JSON.stringify(res.data));
 
-        const embed = new EmbedBuilder().setTitle("急症室等候時間").setColor(0x44b37f).setTimestamp(new Date());
+        const embed = new EmbedBuilder().setTitle("急症室等候時間").setColor(0x44b37f);
         waitTimeData.forEach(async (hospital) => {
             embed.addFields({ name: hospital.hospName, value: `等候時間: ${hospital.topWait}`, inline: true });
         });

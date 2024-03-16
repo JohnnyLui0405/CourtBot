@@ -17,14 +17,14 @@
             }
         ],
         "brace-style": [
-            "error",
+            "warn",
             "stroustrup",
             {
                 "allowSingleLine": true
             }
         ],
         "comma-dangle": [
-            "error",
+            "warn",
             "always-multiline"
         ],
         "comma-spacing": "error",
@@ -39,10 +39,6 @@
             "property"
         ],
         "handle-callback-err": "off",
-        "indent": [
-            "warning",
-            "tab"
-        ],
         "keyword-spacing": "error",
         "max-nested-callbacks": [
             "error",
@@ -62,6 +58,7 @@
         "no-inline-comments": "error",
         "no-lonely-if": "error",
         "no-multi-spaces": "error",
+        "no-unused-vars": "warn",
         "no-multiple-empty-lines": [
             "error",
             {
@@ -89,10 +86,6 @@
             "always"
         ],
         "prefer-const": "error",
-        "quotes": [
-            "error",
-            "single"
-        ],
         "semi": [
             "error",
             "always"
