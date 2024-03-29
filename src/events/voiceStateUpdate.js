@@ -58,32 +58,32 @@ export const action = async (oldState, newState) => {
 
     oldState;
     // #region voice logging
-    // if (newState.member.bot) return;
+    if (newState.member.bot) return;
 
-    // const recordChannel = await oldState.client.channels.fetch("748912260084400238");
+    const recordChannel = await oldState.client.channels.fetch("748912260084400238");
 
-    // if (oldState.channel == null && newState.channel != null) {
-    //     await recordChannel.send({
-    //         embeds: [joinEmbed(newState.member, newState.channel)],
-    //     });
-    // }
+    if (oldState.channel == null && newState.channel != null) {
+        await recordChannel.send({
+            embeds: [joinEmbed(newState.member, newState.channel)],
+        });
+    }
 
-    // if (oldState.channel != null && newState.channel == null) {
-    //     await recordChannel.send({
-    //         embeds: [leaveEmbed(oldState.member, oldState.channel)],
-    //     });
-    // }
+    if (oldState.channel != null && newState.channel == null) {
+        await recordChannel.send({
+            embeds: [leaveEmbed(oldState.member, oldState.channel)],
+        });
+    }
 
-    // if (oldState.channel != null && newState.channel != null) {
-    //     if (oldState.channel.id != newState.channel.id) {
-    //         await recordChannel.send({
-    //             embeds: [leaveEmbed(oldState.member, oldState.channel)],
-    //         });
-    //         await recordChannel.send({
-    //             embeds: [joinEmbed(newState.member, newState.channel)],
-    //         });
-    //     }
-    // }
+    if (oldState.channel != null && newState.channel != null) {
+        if (oldState.channel.id != newState.channel.id) {
+            await recordChannel.send({
+                embeds: [leaveEmbed(oldState.member, oldState.channel)],
+            });
+            await recordChannel.send({
+                embeds: [joinEmbed(newState.member, newState.channel)],
+            });
+        }
+    }
     // #endregion
 
     // #region voice level
