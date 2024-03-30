@@ -23,7 +23,7 @@ export const action = async (client) => {
                     link: item.link,
                     pubDate: item.pubDate,
                 });
-                const channel = await client.channels.fetch("1142323123493015602");
+                const channel = await client.channels.fetch(client.config.internationalNewsChannelId);
                 await channel.send({
                     embeds: [new EmbedBuilder().setTitle(item.title).setURL(item.link).setDescription(item.content).setColor(0x44b37f).setTimestamp(new Date(item.isoDate))],
                 });

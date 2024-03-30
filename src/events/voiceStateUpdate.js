@@ -1,4 +1,4 @@
-import { Events, EmbedBuilder, VoiceState } from "discord.js";
+import { Events, EmbedBuilder, VoiceState, userMention } from "discord.js";
 import { logger } from "../utils/logger.js";
 
 const joinEmbed = (member, channel) => {
@@ -55,6 +55,7 @@ export const event = {
  */
 export const action = async (oldState, newState) => {
     const client = oldState.client;
+    const config = client.config;
 
     oldState;
     // #region voice logging
@@ -104,6 +105,12 @@ export const action = async (oldState, newState) => {
             if (newLevel != -1) {
                 await userCollection.updateOne({ _id: newState.member.id }, { $set: { isVoiceChatting: false, level: newLevel }, $inc: { voiceDuration: duration } });
                 logger.info(`${newState.member.displayName}(${newState.member.id}) || level up to: ${newLevel} with voice duration increased: ${duration} minutes`);
+
+                const levelUpChannel = await client.channels.fetch(config.levelUpNotiChannelId);
+                await levelUpChannel.send({
+                    content: userMention(newState.member.id),
+                    embeds: [levelUpEmbed(newState.member, newLevel)],
+                });
             } else {
                 await userCollection.updateOne({ _id: newState.member.id }, { $set: { isVoiceChatting: false }, $inc: { voiceDuration: duration } });
                 logger.info(`${newState.member.displayName}(${newState.member.id}) || voice duration increased: ${duration} minutes`);
