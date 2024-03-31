@@ -20,8 +20,8 @@ export const action = async (client) => {
         });
         embed.setFooter({ text: "資料來源: 醫院管理局 | 最後更新時間" + new Date().toLocaleString("zh-HK", { timeZone: "Asia/Hong_Kong" }) });
 
-        const channel = await client.channels.fetch("1218065604259614790");
-        const msg = await channel.messages.fetch("1218069220449976320");
+        const channel = await client.channels.fetch(client.config.AnEWaitTimeChannelId);
+        const msg = await channel.messages.fetch(client.config.AnEWaitingTimeMessageId);
         await msg.edit({ embeds: [embed] });
         logger.info(`${job.name} job Done!`);
     });

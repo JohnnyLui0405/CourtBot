@@ -18,7 +18,7 @@ export const action = async (client) => {
 
         const collection = db.collection("weather");
         const data = await collection.findOne({ _id: "weather_warnings" });
-        const channel = await client.channels.fetch("897419340490616843");
+        const channel = await client.channels.fetch(client.config.dailyWeatherChannelId);
 
         for (const [key, value] of Object.entries(res.data)) {
             if (!["WTCSGNL", "WRAIN"].includes(key)) continue;
