@@ -20,7 +20,7 @@ export const action = async (client) => {
         });
         embed.setFooter({ text: "資料來源: 醫院管理局 | 最後更新時間" + new Date().toLocaleString("zh-HK", { timeZone: "Asia/Hong_Kong" }) });
 
-        const channel = await client.channels.fetch(client.config.AnEWaitTimeChannelId);
+        const channel = await client.channels.fetch(client.config.AnEWaitingTimeChannelId);
         const msg = await channel.messages.fetch(client.config.AnEWaitingTimeMessageId);
         await msg.edit({ embeds: [embed] });
         logger.info(`${job.name} job Done!`);

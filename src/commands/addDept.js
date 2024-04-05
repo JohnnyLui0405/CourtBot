@@ -6,7 +6,7 @@ export const command = new SlashCommandBuilder()
     .setDescription("追債服務")
     .addMentionableOption((option) => option.setName("debtor").setDescription("邊個爭你錢呀?").setRequired(true))
     .addNumberOption((option) => option.setName("amount").setDescription("佢爭你幾錢?").setRequired(true))
-    .addStringOption((option) => option.setName("reason").setDescription("備註").setRequired(true).max_length(20))
+    .addStringOption((option) => option.setName("reason").setDescription("備註").setRequired(true).setMaxLength(20))
     .addIntegerOption((option) => option.setName("duedate").setDescription("你想幾時開始幫你追數?(日數e.g. 3)").setRequired(false));
 
 /**
