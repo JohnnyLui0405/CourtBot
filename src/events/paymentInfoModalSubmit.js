@@ -12,7 +12,7 @@ export const event = {
  * @param {ModalSubmitInteraction} interaction
  */
 export const action = async (interaction) => {
-    if (!interaction.isModalSubmit || !interaction.customId == "addPaymentInfoModal") return;
+    if (!interaction.isModalSubmit() || !interaction.customId == "addPaymentInfoModal") return;
     const client = interaction.client;
     const mongoClient = client.mongoClient;
     const userCollection = mongoClient.db("CourtBot").collection("user");
