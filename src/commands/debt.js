@@ -12,7 +12,8 @@ export const action = async (ctx) => {
 
     const addButton = new ButtonBuilder().setLabel("完成債務").setStyle(ButtonStyle.Primary).setCustomId("finishDebt");
     const cancelButton = new ButtonBuilder().setLabel("取消債務").setStyle(ButtonStyle.Danger).setCustomId("cancelDebt");
-    const listAllButton = new ButtonBuilder().setLabel("查看所有債務").setStyle(ButtonStyle.Secondary).setCustomId("listAllDebt");
+    const listAllButton = new ButtonBuilder().setLabel("查看所有債務").setStyle(ButtonStyle.Success).setCustomId("listAllDebt");
+    const addPaymentInfo = new ButtonBuilder().setLabel("新增收款資訊").setStyle(ButtonStyle.Success).setCustomId("addPaymentInfo");
     const embed = new EmbedBuilder()
         .setTitle("追債服務助理")
         .setDescription("歡迎使用追債服務助理")
@@ -28,6 +29,6 @@ export const action = async (ctx) => {
         )
         .setFooter({ text: "追債服務助理在此幫助您實現成功的債務收回結果" })
         .setColor(0x44b37f);
-    const row = new ActionRowBuilder().addComponents(addButton, cancelButton, listAllButton);
+    const row = new ActionRowBuilder().addComponents(addPaymentInfo, listAllButton, addButton, cancelButton);
     await ctx.reply({ embeds: [embed], components: [row] });
 };

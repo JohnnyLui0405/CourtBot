@@ -17,13 +17,10 @@ export const action = async (c) => {
 
     logger.info(`Loading ${files.length} jobs...`);
     for (const file of files) {
-        if (file.includes("dept")) {
-            const jobFile = await import("../../" + file);
-            const job = await jobFile.action(c);
-            job.start();
-            logger.info(`Loaded job ${jobFile.job.name}`);
-        }
-
+        const jobFile = await import("../../" + file);
+        const job = await jobFile.action(c);
+        job.start();
+        logger.info(`Loaded job ${jobFile.job.name}`);
     }
 
     logger.info(`Ready! Logged in as ${c.user.tag}`);
