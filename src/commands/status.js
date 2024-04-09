@@ -8,7 +8,7 @@ export const command = new SlashCommandBuilder()
 
 export const action = async (ctx) => {
     const client = ctx.client;
-    const userCollection = client.mongoClient.db("CourtBot").collection("user");
+    const userCollection = client.db.collection("user");
 
     const user = ctx.options.getMentionable("user") || ctx.user;
     const userData = await userCollection.findOne({ _id: user.id.toString() });

@@ -15,8 +15,8 @@ export const job = {
 export const action = async (client) => {
     return new CronJob("0 21 * * *", async () => {
         logger.info(`Running ${job.name} job...`);
-        const debtCollection = client.mongoClient.db("CourtBot").collection("debt");
-        const userCollection = client.mongoClient.db("CourtBot").collection("user");
+        const debtCollection = client.db.collection("debt");
+        const userCollection = client.db.collection("user");
 
         const now = new Date();
         now.setDate(now.getDate() - 1);

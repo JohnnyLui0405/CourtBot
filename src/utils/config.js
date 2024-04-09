@@ -4,6 +4,6 @@ export const config = {
     localNewsChannelId: "1142323103188402206",
     internationalNewsChannelId: "1142323123493015602",
     AnEWaitingTimeChannelId: "1218065604259614790",
-    AnEAWaitingTimeMessageId: "1218069220449976320",
+    AnEWaitingTimeMessageId: "1218069220449976320",
     waterReminderChannelId: "757821286553616449",
 };

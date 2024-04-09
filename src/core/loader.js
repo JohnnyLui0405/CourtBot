@@ -3,8 +3,10 @@ import fg from "fast-glob";
 import { logger } from "../utils/logger.js";
 
 const updateSlashCommands = async (commands) => {
-    const rest = new REST({ version: 10 }).setToken(process.env.TOKEN);
-    await rest.put(Routes.applicationGuildCommands(process.env.APPLICATION_ID, "736602050024177665"), {
+    const token = process.env.NODE_ENV === "production" ? process.env.TOKEN : process.env.DEV_TOKEN;
+    const applicationId = process.env.NODE_ENV === "production" ? process.env.APPLICATION_ID : process.env.DEV_APPLICATION_ID;
+    const rest = new REST({ version: 10 }).setToken(token);
+    await rest.put(Routes.applicationGuildCommands(applicationId, "736602050024177665"), {
         body: commands,
     });
 };

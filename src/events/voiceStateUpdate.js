@@ -89,10 +89,10 @@ export const action = async (oldState, newState) => {
 
     // #region voice level
     if (oldState.channel == null && newState.channel != null) {
-        const userCollection = client.mongoClient.db("CourtBot").collection("user");
+        const userCollection = client.db.collection("user");
         await userCollection.updateOne({ _id: newState.member.id }, { $set: { isVoiceChatting: true, lastJoinedDate: new Date() } }, { upsert: true });
     } else if (oldState.channel != null && newState.channel == null) {
-        const userCollection = client.mongoClient.db("CourtBot").collection("user");
+        const userCollection = client.db.collection("user");
         const userData = await userCollection.findOne({ _id: newState.member.id });
 
         if (userData.isVoiceChatting) {

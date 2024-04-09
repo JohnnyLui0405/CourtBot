@@ -8,8 +8,8 @@ export const command = new SlashCommandBuilder()
 
 export const action = async (ctx) => {
     const client = ctx.client;
-    const userCollection = client.mongoClient.db("CourtBot").collection("IQTest");
-    const iqCollection = client.mongoClient.db("CourtBot").collection("iq");
+    const userCollection = client.db.collection("IQTest");
+    const iqCollection = client.db.collection("iq");
 
     const user = ctx.options.getMentionable("user");
     const iq = ctx.options.getInteger("iq");

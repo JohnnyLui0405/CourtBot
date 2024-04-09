@@ -1,4 +1,4 @@
-import { BaseInteraction, ButtonBuilder, EmbedBuilder, ActionRowBuilder, SlashCommandBuilder, userMention } from "discord.js";
+import { BaseInteraction, ButtonBuilder, EmbedBuilder, ActionRowBuilder, SlashCommandBuilder, userMention, ButtonStyle } from "discord.js";
 import { logger } from "../utils/logger.js";
 
 export const command = new SlashCommandBuilder()
@@ -15,7 +15,8 @@ export const command = new SlashCommandBuilder()
  */
 export const action = async (ctx) => {
     const client = ctx.client;
-    const deptCollection = client.mongoClient.db("CourtBot").collection("debt");
+    const deptCollection = client.db.collection("debt");
+    const paymentInfoCollection = client.db.collection("paymentInfo");
 
     const user = ctx.options.getMentionable("debtor");
     const amount = ctx.options.getNumber("amount");
@@ -25,7 +26,7 @@ export const action = async (ctx) => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + (ctx.options.getInteger("duedate") || 0));
     dueDate.setHours(0, 0, 0, 0);
-    await deptCollection.insertOne({
+    const inserted = await deptCollection.insertOne({
         debtorId: user.id,
         debtorName: user.displayName,
         creditorId: ctx.user.id,
@@ -47,16 +48,33 @@ export const action = async (ctx) => {
         .setTitle("追債指示確認")
         .setColor(0x33ccff)
         .setFields(
+            { name: "ID", value: inserted.insertedId.toHexString() },
             { name: "債務人", value: userMention(user.id) },
             { name: "債權人", value: userMention(ctx.member.id) },
-            { name: "金額", value: amount + " 元" },
-            { name: "備註", value: ctx.options.getString("reason") },
+            { name: "金額", value: amount + " 元", inline: true },
+            { name: "備註", value: ctx.options.getString("reason"), inline: true },
             { name: "債務到期日", value: dueDate.toLocaleDateString() },
             { name: "指示創建日", value: createdDate.toLocaleDateString() }
         )
         .setFooter({ text: "感謝您使用追債服務助理！" })
         .setTimestamp(new Date());
 
-    await ctx.reply({ embeds: [embed] });
-    await user.send({ content: "你有一筆新債務，請查看:", embeds: [embed] });
+    if ((await paymentInfoCollection.countDocuments({ _id: user.id })) === 0) {
+        const setupPaymentInfoReminderEmbed = client.debtEmbedBuilder().setTitle("新增收款資訊").setDescription("請新增收款資訊，以便您的債務人可以付款給您").setColor(0x33ccff);
+        const setupPaymentInfoButton = new ButtonBuilder().setLabel("新增收款資訊").setStyle(ButtonStyle.Primary).setCustomId("addPaymentInfo");
+        const row = new ActionRowBuilder().addComponents(setupPaymentInfoButton);
+        await ctx.reply({ embeds: [embed, setupPaymentInfoReminderEmbed], components: [row], ephemeral: true });
+        await user.send({ content: "你有一筆新債務，請查看:", embeds: [embed] });
+        return;
+    }
+
+    await ctx.reply({ embeds: [embed], ephemeral: true });
+
+    const paymentInfo = await paymentInfoCollection.findOne({ _id: user.id });
+    const paymentInfoEmbed = client
+        .debtEmbedBuilder()
+        .setTitle("對方的收款資訊")
+        .setDescription(`收款人名稱: ${paymentInfo.receiverName}\nPayMe URL: ${paymentInfo.paymeURL || "N/A"}\nFPS: ${paymentInfo.FPS || "N/A"}`)
+        .setColor(0x33ccff);
+    await user.send({ content: "你有一筆新債務，請查看:", embeds: [embed, paymentInfoEmbed] });
 };

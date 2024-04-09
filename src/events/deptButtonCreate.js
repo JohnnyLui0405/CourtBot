@@ -30,7 +30,7 @@ export const action = async (interaction) => {
     if (!interaction.isButton()) return;
     const client = interaction.client;
     const mongoClient = client.mongoClient;
-    const deptCollection = mongoClient.db("CourtBot").collection("debt");
+    const deptCollection = client.db.collection("debt");
 
     logger.info(`${interaction.user.displayName}(${interaction.user.id}) clicked button ${interaction.customId}`);
 
@@ -95,7 +95,9 @@ export const action = async (interaction) => {
             const finishRow = new ActionRowBuilder();
             const finishSelectMenu = new StringSelectMenuBuilder().setCustomId("finishDebtSelect").setPlaceholder("請選擇欲完成的債務");
             credits.forEach((credit, index) => {
-                finishSelectMenu.addOptions(new StringSelectMenuOptionBuilder().setLabel(`${index + 1}. ${credit.debtorName} 欠您 ${credit.amount} 元`).setValue(credit._id.toHexString()));
+                finishSelectMenu.addOptions(
+                    new StringSelectMenuOptionBuilder().setLabel(`${index + 1}. ${credit.debtorName} 欠您 ${credit.amount} 元 (${credit.reason})`).setValue(credit._id.toHexString())
+                );
             });
             finishRow.addComponents(finishSelectMenu);
             const actionText = interaction.customId === "finishDebt" ? "完成" : "取消";
@@ -111,6 +113,21 @@ export const action = async (interaction) => {
                     const finishDebtQuery = await deptCollection.updateOne({ _id: debtId }, { $set: { status: status } });
                     logger.info(`Debt ${debtId.toHexString()} has been finished by ${interaction.member.id} | Status: ${status}`);
                     await selectInteraction.reply({ content: `您已完成 ${debt.debtorName} 欠您 ${debt.amount} 元 的債務`, ephemeral: true });
+
+                    const debtor = await client.users.fetch(debt.debtorId);
+                    const finishEmbed = client
+                        .debtEmbedBuilder()
+                        .setTitle(`債務${actionText}`)
+                        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() })
+                        .setFields(
+                            { name: "ID", value: debtId.toHexString() },
+                            { name: "債務人", value: userMention(debt.debtorId) },
+                            { name: "債權人", value: userMention(debt.creditorId) },
+                            { name: "金額", value: debt.amount + " 元", inline: true },
+                            { name: "備註", value: debt.reason, inline: true }
+                        );
+                    await debtor.send({ embeds: [finishEmbed] });
+                    logger.info(`Debt ${debtId.toHexString()} | sent finish message to ${debtor.username}(${debtor.id})`);
                 })
                 .catch(async (err) => {
                     logger.error(err);
@@ -120,7 +137,7 @@ export const action = async (interaction) => {
         case "listAllDebt":
             if (debts.length === 0 && credits.length === 0) {
                 const embed = client.debtEmbedBuilder().setTitle("債務列表").setDescription("您目前沒有任何債務");
-                await interaction.reply({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed], ephemeral: true });
                 return;
             }
 
@@ -130,13 +147,19 @@ export const action = async (interaction) => {
             debtsEmbed.setDescription("您目前的欠債");
             if (debts.length === 0) debtsEmbed.setDescription("您目前沒有任何欠債");
             debts.forEach((debt, index) => {
-                debtsEmbed.addFields({ name: `${index + 1}. 您欠 ${debt.creditorName} ${debt.amount} 元`, value: `備註: ${debt.reason} | 到期日: ${debt.dueDate.toLocaleDateString()}` });
+                debtsEmbed.addFields({
+                    name: `${index + 1}. 您欠 ${debt.creditorName} ${debt.amount} 元`,
+                    value: `ID:${debt._id.toHexString()}\n備註: ${debt.reason} | 到期日: ${debt.dueDate.toLocaleDateString()}`,
+                });
             });
 
             creditsEmbed.setDescription("您目前的放債");
             if (credits.length === 0) creditsEmbed.setDescription("您目前沒有任何放債");
             credits.forEach((credit, index) => {
-                creditsEmbed.addFields({ name: `${index + 1}. ${credit.debtorName} 欠您 ${credit.amount} 元`, value: `備註: ${credit.reason} | 到期日: ${credit.dueDate.toLocaleDateString()}` });
+                creditsEmbed.addFields({
+                    name: `${index + 1}. ${credit.debtorName} 欠您 ${credit.amount} 元`,
+                    value: `ID:${credit._id.toHexString()}\n備註: ${credit.reason} | 到期日: ${credit.dueDate.toLocaleDateString()}`,
+                });
             });
 
             await interaction.reply({ embeds: [debtsEmbed, creditsEmbed], ephemeral: true });

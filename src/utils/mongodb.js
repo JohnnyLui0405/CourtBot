@@ -5,4 +5,6 @@ export const mongoClient = new MongoClient(process.env.MONGO_TOKEN, {
     serverApi: ServerApiVersion.v1,
 });
 
-export const db = mongoClient.db("CourtBot");
+// if else
+const dbName = process.env.NODE_ENV === "production" ? "CourtBot" : "CourtBotTest";
+export const db = mongoClient.db(dbName);
