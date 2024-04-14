@@ -43,12 +43,17 @@ export const action = async (interaction) => {
     const debts = await debtCollection.aggregate([{ $match: { creditorId: interaction.user.id, status: 0 } }, { $group: { _id: "$debtorId" } }]).toArray();
 
     debts.forEach(async (debt) => {
-        const debtor = await client.users.fetch(debt._id);
-        const paymentInfoEmbed = client
-            .debtEmbedBuilder()
-            .setTitle("債權人收款資訊")
-            .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() })
-            .setFields({ name: "收款人名稱", value: receiverName }, { name: "PayMe URL", value: paymeURL || "N/A" }, { name: "FPS", value: FPS || "N/A" });
-        await debtor.send({ content: `${userMention(debt._id)} 已更新收款資訊`, embeds: [paymentInfoEmbed] });
+        try {
+            const debtor = await client.users.fetch(debt._id);
+            const paymentInfoEmbed = client
+                .debtEmbedBuilder()
+                .setTitle("債權人收款資訊")
+                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() })
+                .setFields({ name: "收款人名稱", value: receiverName }, { name: "PayMe URL", value: paymeURL || "N/A" }, { name: "FPS", value: FPS || "N/A" });
+            await debtor.send({ content: `${userMention(debt._id)} 已更新收款資訊`, embeds: [paymentInfoEmbed] });
+            logger.info(`Notified ${debtor.username}(${debtor.id}) about the updated payment info`);
+        } catch (error) {
+            logger.error(error);
+        }
     });
 };
