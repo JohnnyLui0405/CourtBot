@@ -21,7 +21,7 @@ export const action = async (client) => {
                     _id: item.guid,
                     title: item.title,
                     link: item.link,
-                    pubDate: item.pubDate,
+                    pubDate: new Date(item.isoDate),
                 });
                 const channel = await client.channels.fetch(client.config.internationalNewsChannelId);
                 await channel.send({
@@ -29,6 +29,7 @@ export const action = async (client) => {
                 });
             }
         });
+
         logger.info(`${job.name} job Done!`);
     });
 };
