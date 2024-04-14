@@ -52,7 +52,9 @@ export const action = async (interaction) => {
         await creditor.send({ embeds: [remindEmbed] });
         await interaction.reply({ content: "已提醒對方", ephemeral: true });
         const disabledRemindButton = new ButtonBuilder().setCustomId(`remindDebt-${debtId.toHexString()}`).setLabel("已提醒").setStyle(ButtonStyle.Secondary).setDisabled(true);
-        await interaction.message.edit({ components: [new ActionRowBuilder().setComponents(disabledRemindButton)] });
+        const interactionChannel = await client.channels.fetch(interaction.channelId);
+        const interactionMsg = await interactionChannel.messages.fetch(interaction.message.id);
+        await interactionMsg.edit({ components: [new ActionRowBuilder().setComponents(disabledRemindButton)] });
         return;
     }
 
