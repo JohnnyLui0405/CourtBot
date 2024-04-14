@@ -10,6 +10,8 @@ export const event = {
 export const action = async (c) => {
     const files = await fg("./src/jobs/**.js");
 
+    c.isCitylineSent = false;
+
     if (process.env.NODE_ENV === "development") {
         logger.info("Development mode detected, skipping job loading...");
         return;
