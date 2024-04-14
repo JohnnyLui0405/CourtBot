@@ -54,6 +54,7 @@ export const event = {
  * @param {VoiceState} newState
  */
 export const action = async (oldState, newState) => {
+    if (process.env.NODE_ENV === "development") return;
     const client = oldState.client;
     const config = client.config;
 
