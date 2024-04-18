@@ -9,7 +9,7 @@ export const job = {
 };
 
 export const action = async (client) => {
-    return new CronJob("0 */2 * * *", async () => {
+    return new CronJob("* * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
         const res = await axios.get("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc");
         logger.info(JSON.stringify(res.data));
