@@ -1,4 +1,4 @@
-import { Events, EmbedBuilder, VoiceState, userMention } from "discord.js";
+import { Events, EmbedBuilder, VoiceState, userMention, MessageFlags } from "discord.js";
 import { logger } from "../utils/logger.js";
 
 const joinEmbed = (member, channel) => {
@@ -111,7 +111,7 @@ export const action = async (oldState, newState) => {
                 await levelUpChannel.send({
                     content: userMention(newState.member.id),
                     embeds: [levelUpEmbed(newState.member, newLevel)],
-                    flags: [4096],
+                    flags: [MessageFlags.SuppressNotifications],
                 });
             } else {
                 await userCollection.updateOne({ _id: newState.member.id }, { $set: { isVoiceChatting: false }, $inc: { voiceDuration: duration } });
