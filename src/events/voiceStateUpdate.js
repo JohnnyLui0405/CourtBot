@@ -111,6 +111,7 @@ export const action = async (oldState, newState) => {
                 await levelUpChannel.send({
                     content: userMention(newState.member.id),
                     embeds: [levelUpEmbed(newState.member, newLevel)],
+                    flags: [4096],
                 });
             } else {
                 await userCollection.updateOne({ _id: newState.member.id }, { $set: { isVoiceChatting: false }, $inc: { voiceDuration: duration } });
