@@ -59,7 +59,7 @@ export const action = async (ctx) => {
         .setFooter({ text: "感謝您使用追債服務助理！" })
         .setTimestamp(new Date());
 
-    if ((await paymentInfoCollection.countDocuments({ _id: user.id })) === 0) {
+    if ((await paymentInfoCollection.countDocuments({ _id: ctx.user.id })) === 0) {
         const setupPaymentInfoReminderEmbed = client.debtEmbedBuilder().setTitle("新增收款資訊").setDescription("請新增收款資訊，以便您的債務人可以付款給您").setColor(0x33ccff);
         const setupPaymentInfoButton = new ButtonBuilder().setLabel("新增收款資訊").setStyle(ButtonStyle.Primary).setCustomId("addPaymentInfo");
         const row = new ActionRowBuilder().addComponents(setupPaymentInfoButton);
@@ -70,7 +70,7 @@ export const action = async (ctx) => {
 
     await ctx.reply({ embeds: [embed], ephemeral: true });
 
-    const paymentInfo = await paymentInfoCollection.findOne({ _id: user.id });
+    const paymentInfo = await paymentInfoCollection.findOne({ _id: ctx.user.id });
     const paymentInfoEmbed = client
         .debtEmbedBuilder()
         .setTitle("對方的收款資訊")
