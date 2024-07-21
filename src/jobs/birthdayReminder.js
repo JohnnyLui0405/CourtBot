@@ -13,7 +13,7 @@ export const action = async (client) => {
         const today = new Date();
         const userColleciton = client.db.collection("user");
 
-        const users = await userColleciton.find({ $expr: { $and: [{ $eq: [{ $month: "$birthday" }, 4] }, { $eq: [{ $dayOfMonth: "$birthday" }, 5] }] } }).toArray();
+        const users = await userColleciton.find({ $expr: { $and: [{ $eq: [{ $month: "$birthday" }, today.getMonth()] }, { $eq: [{ $dayOfMonth: "$birthday" }, today.getDay()] }] } }).toArray();
 
         for (const userData of users) {
             const user = await client.users.fetch(userData._id);
