@@ -15,7 +15,6 @@ export const action = async (ctx) => {
     const userCollection = client.db.collection("user");
 
     const date = new Date(ctx.options.getString("date"));
-
     // get duedate by adding the number of days to the current date
     const createdDate = new Date();
     const inserted = await userCollection.updateOne({ _id: ctx.user.id }, { $set: { birthday: date } }, { upsert: true });
@@ -25,7 +24,7 @@ export const action = async (ctx) => {
     const embed = new EmbedBuilder()
         .setTitle("生日新增成功")
         .setColor(0x33ccff)
-        .setFields({ name: "ID", value: ctx.user.id }, { name: "生日日期", value: date.toLocaleDateString() }, { name: "新增日期", value: createdDate.toLocaleDateString() })
+        .setFields({ name: "使用者", value: userMention(ctx.user.id) }, { name: "生日日期", value: date.toLocaleDateString() }, { name: "新增日期", value: createdDate.toLocaleDateString() })
         .setFooter({ text: "感謝您使用服務！" })
         .setTimestamp(new Date());
 
