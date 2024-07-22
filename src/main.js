@@ -20,6 +20,9 @@ client.config = config;
 client.mongoClient.connect().then(() => {
     logger.info("Connected to MongoDB");
 });
+client.mainEmbedBuilder = () => {
+    return new EmbedBuilder().setFooter({ text: "Court Bot" }).setTimestamp(new Date()).setColor(0x33ccff);
+};
 client.debtEmbedBuilder = () => {
     return new EmbedBuilder().setFooter({ text: "追債服務助理" }).setTimestamp(new Date()).setColor(0x33ccff);
 };
