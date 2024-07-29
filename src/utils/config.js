@@ -6,5 +6,5 @@ export const config = {
     AnEWaitingTimeChannelId: "1218065604259614790",
     AnEWaitingTimeMessageId: "1218069220449976320",
     waterReminderChannelId: "757821286553616449",
-    birthdayChannelId: "922161753247338536",
+    birthdayChannelId: "736609710165458944",
 };
