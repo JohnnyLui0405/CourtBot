@@ -58,7 +58,6 @@ export const action = async (oldState, newState) => {
     const client = oldState.client;
     const config = client.config;
 
-    oldState;
     // #region voice logging
     if (newState.member.bot) return;
 
