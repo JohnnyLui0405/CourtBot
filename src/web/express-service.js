@@ -1,6 +1,6 @@
 import express from "express";
-import { mongoClient, db } from "./utils/mongodb.js";
-import { logger } from "./utils/logger.js";
+import { mongoClient, db } from "../utils/mongodb.js";
+import { logger } from "../utils/logger.js";
 
 const app = express();
 const port = 80;
@@ -18,6 +18,13 @@ app.get("/:shortURLId", async (req, res) => {
 
     logger.info(`Redirecting ${req.ip} to ${urlData.url}`);
     res.redirect(urlData.url);
+});
+
+app.get("/auth/discord", async (req, res) => {
+    logger.info(`Discord auth request from ${req.ip}`);
+    // res.sendFile("auth.html", { root: "./src/web" });
+    logger.info(`access code is ${req.query.code}`);
+    res.send("OK");
 });
 
 app.listen(port, () => {
