@@ -12,9 +12,7 @@ export const action = async (client) => {
     return new CronJob("* * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
         const res = await axios.get("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc");
-        logger.info(JSON.stringify(res.data));
-
-        // if (res.data?.WTCSGNL == undefined && res.data?.WRAIN == undefined) return;
+        const swtRes = await axios.get("https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=swt&lang=tc");
 
         const collection = db.collection("weather");
         const data = await collection.findOne({ _id: "weather_warnings" });
@@ -86,18 +84,15 @@ export const action = async (client) => {
                 await collection.updateOne({ _id: "weather_warnings" }, { $unset: { [key]: "" } });
             }
         }
-
-        // for (const key of Object.keys(data)) {
-        //     if (!["WTCSGNL", "WRAIN", "WHOT"].includes(key)) continue;
-        //     if (res.data[key] == undefined) {
-        //         logger.info(`Weather warning removed: ${key}`);
-        //         await channel.send({
-        //             content: `天文台取消${data[key].name}`,
-        //         });
-        //         delete data[key];
-        //         await collection.updateOne({ _id: "weather_warnings" }, { $unset: { [key]: "" } });
-        //     }
-        // }
+        // {"swt":[{"desc":"預料強陣風繼續吹襲香港。如身處室外，請儘快到安全地方躲避。 在下午6時45分左右，流浮山錄得每小時約75公里的強陣風。","updateTime":"2024-08-18T18:50:00+08:00"},{"desc":"短期內香港廣泛地區可能受大雨影響，市民應提高警覺。","updateTime":"2024-08-18T18:25:00+08:00"}]}
+        for (const tips of swtRes.data.swt) {
+            if (new Date().getTime() - new Date(tips.updateTime).getTime() <= 80 * 1000) {
+                await channel.send({
+                    content: `@everyone`,
+                    embeds: [client.mainEmbedBuilder().setTitle("天文台特別天氣提示").setDescription(tips.desc).setColor(0xffcc01).setTimestamp(new Date(tips.updateTime))],
+                });
+            }
+        }
         logger.info(`${job.name} job Done!`);
     });
 };
