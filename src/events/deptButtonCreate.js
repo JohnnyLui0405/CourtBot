@@ -22,6 +22,16 @@ export const event = {
     name: Events.InteractionCreate,
 };
 
+const getStatusString = (status) => {
+    switch (status) {
+        case 0:
+            return "未債還";
+        case 1:
+            return "完成";
+        case 2:
+            return "取消";
+    }
+};
 /**
  *
  * @param {ButtonInteraction} interaction
@@ -30,14 +40,14 @@ export const action = async (interaction) => {
     if (!interaction.isButton()) return;
     const client = interaction.client;
     const mongoClient = client.mongoClient;
-    const deptCollection = client.db.collection("debt");
+    const debtCollection = client.db.collection("debt");
 
     logger.info(`${interaction.user.displayName}(${interaction.user.id}) clicked button ${interaction.customId}`);
 
     if (interaction.customId.startsWith("remindDebt")) {
         console.log(interaction.customId);
         const debtId = new ObjectId(interaction.customId.split("-")[1]);
-        const debt = await deptCollection.findOne({ _id: debtId });
+        const debt = await debtCollection.findOne({ _id: debtId });
         if (debt.status !== 0) {
             await interaction.reply("此債務已完成或取消", { ephemeral: true });
             return;
@@ -58,8 +68,8 @@ export const action = async (interaction) => {
         return;
     }
 
-    const debts = await deptCollection.find({ debtorId: interaction.member.id, status: 0 }).toArray();
-    const credits = await deptCollection.find({ creditorId: interaction.member.id, status: 0 }).toArray();
+    const debts = await debtCollection.find({ debtorId: interaction.member.id, status: 0 }).toArray();
+    const credits = await debtCollection.find({ creditorId: interaction.member.id, status: 0 }).toArray();
 
     switch (interaction.customId) {
         case "addPaymentInfo":
@@ -110,9 +120,9 @@ export const action = async (interaction) => {
                 .then(async (selectInteraction) => {
                     const debtId = new ObjectId(selectInteraction.values[0]);
 
-                    const debt = await deptCollection.findOne({ _id: debtId });
+                    const debt = await debtCollection.findOne({ _id: debtId });
                     const status = interaction.customId === "finishDebt" ? 1 : 2;
-                    const finishDebtQuery = await deptCollection.updateOne({ _id: debtId }, { $set: { status: status } });
+                    const finishDebtQuery = await debtCollection.updateOne({ _id: debtId }, { $set: { status: status } });
                     logger.info(`Debt ${debtId.toHexString()} has been finished by ${interaction.member.id} | Status: ${status}`);
                     await selectInteraction.reply({ content: `您已完成 ${debt.debtorName} 欠您 ${debt.amount} 元 的債務`, ephemeral: true });
 
@@ -165,6 +175,33 @@ export const action = async (interaction) => {
             });
 
             await interaction.reply({ embeds: [debtsEmbed, creditsEmbed], ephemeral: true });
+            break;
+        case "checkDebtHistory":
+            const debtHistory = await debtCollection.find({ $or: [{ detborId: interaction.user.id }, { creditorId: interaction.user.id }] }).sort({ createdDate: -1 }).limit(10).toArray();
+
+            if (debtHistory.length == 0) {
+                const embed = client.debtEmbedBuilder().setTitle("債務歷史列表").setDescription("您沒有任何債務歷史");
+                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return;
+            }
+
+            const historyEmbed = client.debtEmbedBuilder().setTitle("最近十次債務歷史").setColor(0x808080);
+            debtHistory.forEach((record, index) => {
+                if (record.debtorId == interaction.user.id) {
+                    historyEmbed.addFields({
+                        name: `${index + 1}. 您欠 ${record.creditorName} ${record.amount} 元`,
+                        value: `ID:${record._id.toHexString()} | 狀態:${getStatusString(record.status)}\n備註: ${record.reason} | 到期日: ${record.dueDate.toLocaleDateString()}`
+                    });
+                } else {
+                    historyEmbed.addFields({
+                        name: `${index + 1}. ${record.debtorName} 欠您 ${record.amount} 元`,
+                        value: `ID:${record._id.toHexString()} | 狀態:${getStatusString(record.status)}\n備註: ${record.reason} | 到期日: ${record.dueDate.toLocaleDateString()}`
+                    });
+                }
+
+            });
+
+            await interaction.reply({ embeds: [historyEmbed], ephemeral: true });
             break;
         default:
             break;
