@@ -2,10 +2,28 @@ import express from "express";
 import { mongoClient, db } from "../utils/mongodb.js";
 import { logger } from "../utils/logger.js";
 import axios from "axios";
+import jwt from 'jsonwebtoken';
+import apiRouter from './router/api.js';
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 const app = express();
 const port = 80;
 const urlCollection = db.collection("url");
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use('/api', apiRouter);
+
+app.get("/", async (req, res) => {
+    logger.info("");
+    res.sendFile("/Users/johnnylui/Desktop/GitProject/CourtBot/src/web/public/index.html");
+});
+
+app.get("/home", async (req, res) => {
+    res.sendFile('home.html', { root: '/Users/johnnylui/Desktop/GitProject/CourtBot/src/web/public' });
+});
 
 app.get("/:shortURLId", async (req, res) => {
     logger.info(`URL ${req.params.shortURLId} clicked by ${req.ip}`);
@@ -20,8 +38,6 @@ app.get("/:shortURLId", async (req, res) => {
     logger.info(`Redirecting ${req.ip} to ${urlData.url}`);
     res.redirect(urlData.url);
 });
-
-app.use('/public', express.static("/Users/johnnylui/Desktop/GitProject/CourtBot/src/web/public"));
 
 app.get("/auth/discord", async (req, res) => {
     logger.info(`Discord auth request from ${req.ip}`);
@@ -47,7 +63,12 @@ app.get("/auth/discord", async (req, res) => {
             const userResult = await axios.get('https://discord.com/api/users/@me', { "headers": { 'Authorization': `${oauthData.token_type} ${oauthData.access_token}` } });
             logger.info(JSON.stringify(userResult.data));
 
-            res.send(`Hi ${userResult.data.username}`);
+            const token = jwt.sign({ userId: userResult.data.id, username: userResult.data.username }, process.env.JWT_SECRET, { algorithm: "HS256" });
+
+            res.cookie('token', token);
+            res.sendFile('home.html', { root: '/Users/johnnylui/Desktop/GitProject/CourtBot/src/web/public' });
+
+            // res.send(`Hi ${userResult.data.username}`);
 
         } catch (error) {
             // NOTE: An unauthorized token will not throw an error
