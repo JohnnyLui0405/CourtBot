@@ -18,10 +18,14 @@ export const action = async (message) => {
     await message.channel.sendTyping();
     const content_prefix = "Please answer the following question 2000 or fewer in length .\n";
     const model = client.config.aiChatChannelId[message.channel.id];
-
     const completion = await client.openai.chat.completions.create({
         model: aiChatChannelId[message.channel.id],
         messages: [
+            {
+                role: "system",
+                content:
+                    "DeepSeek, please provide concise responses, focusing on the main points without unnecessary details. Ensure clarity and structure your answer to address the key aspects of the query. Keep your response under 1800 characters.",
+            },
             {
                 role: "user",
                 content: message.content,
@@ -29,6 +33,5 @@ export const action = async (message) => {
         ],
         max_tokens: 500,
     });
-    console.log(completion);
     await message.reply(completion.choices[0].message.content);
 };
