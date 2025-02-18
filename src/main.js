@@ -3,6 +3,7 @@ dotenv.config();
 import { Client, EmbedBuilder, Events, GatewayIntentBits } from "discord.js";
 import { loadCommands, loadEvents } from "./core/loader.js";
 import { mongoClient, db } from "./utils/mongodb.js";
+import { openai } from "./utils/openaisdk.js";
 import { logger } from "./utils/logger.js";
 import { config } from "./utils/config.js";
 
@@ -22,6 +23,7 @@ loadEvents(client);
 loadCommands(client);
 
 client.mongoClient = mongoClient;
+client.openai = openai;
 client.db = db;
 client.config = config;
 client.mongoClient.connect().then(() => {
