@@ -11,14 +11,13 @@
         "express-dev": "nodemon src/web/express-service.js"
     },
     "dependencies": {
-        "axios": "^1.4.0",
         "bluebird": "^3.7.2",
         "body-parser": "^1.20.3",
         "cookie-parser": "^1.4.6",
         "cron": "^2.2.0",
         "discord.js": "^14.14.1",
         "dotenv": "^16.0.3",
-        "express": "^4.19.2",
+        "express": "^4.21.2",
         "fast-glob": "^3.2.12",
         "imap": "^0.8.19",
         "jsonwebtoken": "^9.0.2",
@@ -26,7 +25,11 @@
         "rss-parser": "^3.13.0",
         "short-unique-id": "^5.2.0",
         "speakeasy": "^2.0.0",
-        "winston": "^3.10.0"
+        "winston": "^3.10.0",
+        "axios": "^1.8.4",
+        "connect-mongo": "^5.1.0",
+        "ejs": "^3.1.10",
+        "express-session": "^1.18.1"
     },
     "devDependencies": {
         "eslint": "^8.57.0"

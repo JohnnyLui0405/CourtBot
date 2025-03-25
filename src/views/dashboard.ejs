@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>URL Shortener - Dashboard</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        animation: {
+                            "fade-up": "fadeUp 0.5s ease-in",
+                        },
+                        keyframes: {
+                            fadeUp: {
+                                "0%": { opacity: "0", transform: "translateY(20px)" },
+                                "100%": { opacity: "1", transform: "translateY(0)" },
+                            },
+                        },
+                    },
+                },
+            };
+        </script>
+    </head>
+    <body class="bg-gray-100 min-h-screen">
+        <nav class="bg-white shadow-md p-4 animate-fade-up">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <h1 class="text-xl font-bold">URL Shortener</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, <%= user.username %></span>
+                    <button id="logout" class="text-gray-600 hover:text-gray-800">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto p-6">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6 animate-fade-up">
+                <h2 class="text-lg font-semibold mb-4">Create Short URL</h2>
+                <form id="shortenForm" class="space-y-4" action="/shorten" method="POST">
+                    <div>
+                        <input type="url" name="originalUrl" placeholder="Enter your URL here" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+                    </div>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Shorten URL</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 animate-fade-up">
+                <h2 class="text-lg font-semibold mb-4">Your Short URLs</h2>
+                <div id="urlList" class="space-y-4">
+                    <% if (urls && urls.length > 0) { %> <% urls.slice((page - 1) * perPage, page * perPage).forEach(url => { %>
+                    <div class="flex items-center justify-between p-3 border rounded-md animate-fade-up">
+                        <div class="max-w-[75%]">
+                            <p class="text-sm text-gray-600 truncate">Original: <%= url.original %></p>
+                            <p class="font-medium truncate">Short: <%= url.shortURL %></p>
+                            <p class="text-sm text-gray-500 truncate">Clicks: <%= url.clicks %></p>
+                        </div>
+                        <button class="text-indigo-600 hover:text-indigo-800 copy-btn" data-url="<%= url.shortened %>">Copy</button>
+                    </div>
+                    <% }); %>
+                    <!-- Pagination Controls -->
+                    <div class="flex justify-between items-center mt-4">
+                        <a href="?page=<%= page > 1 ? page - 1 : 1 %>" class="px-4 py-2 bg-gray-200 rounded-md <%= page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"> Previous </a>
+                        <span class="text-gray-600"> Page <%= page %> of <%= Math.ceil(totalUrls / perPage) %> </span>
+                        <a
+                            href="?page=<%= page < Math.ceil(totalUrls / perPage) ? page + 1 : Math.ceil(totalUrls / perPage) %>"
+                            class="px-4 py-2 bg-gray-200 rounded-md <%= page === Math.ceil(totalUrls / perPage) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"
+                        >
+                            Next
+                        </a>
+                    </div>
+                    <% } else { %>
+                    <p class="text-gray-500 text-center">No URLs shortened yet</p>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            // Form submission handling
+            document.getElementById("shortenForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: JSON.stringify({ originalUrl: form.originalUrl.value }),
+                    headers: { "Content-Type": "application/json" },
+                });
+                if (response.ok) {
+                    alert("URL shortened successfully!");
+                    window.location.reload();
+                } else {
+                    alert(await response.text());
+                }
+            });
+
+            // Logout handling
+            document.getElementById("logout").addEventListener("click", async () => {
+                await fetch("/auth/logout", { method: "POST" });
+                window.location.href = "/";
+            });
+
+            // Copy button handling
+            document.querySelectorAll(".copy-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const url = btn.dataset.url;
+                    navigator.clipboard.writeText(url);
+                    btn.textContent = "Copied!";
+                    setTimeout(() => (btn.textContent = "Copy"), 2000);
+                });
+            });
+        </script>
+    </body>
+</html>
