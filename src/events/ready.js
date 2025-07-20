@@ -12,13 +12,16 @@ export const action = async (c) => {
 
     c.isCitylineSent = false;
 
-    if (process.env.NODE_ENV === "development") {
-        logger.info("Development mode detected, skipping job loading...");
-        return;
-    }
-
     logger.info(`Loading ${files.length} jobs...`);
     for (const file of files) {
+        if (process.env.NODE_ENV === "development") {
+            const debugJobList = ["presence"];
+            if (!debugJobList.includes(file.split("/").pop().split(".")[0])) {
+                logger.info(`Development mode detected, skipping job ${file.split("/").pop().split(".")[0]}...`);
+                continue;
+            }
+        }
+
         const jobFile = await import("../../" + file);
         const job = await jobFile.action(c);
         job.start();
