@@ -1,4 +1,4 @@
-import { BaseInteraction, ButtonBuilder, EmbedBuilder, ActionRowBuilder, SlashCommandBuilder, userMention, CommandInteraction, ButtonStyle, Options } from "discord.js";
+import { ButtonBuilder, EmbedBuilder, ActionRowBuilder, SlashCommandBuilder, ButtonStyle } from "discord.js";
 import { logger } from "../utils/logger.js";
 
 export const command = new SlashCommandBuilder().setName("追債公司").setDescription("追債服務");
