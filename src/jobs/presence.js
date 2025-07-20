@@ -21,7 +21,7 @@ export const action = async (client) => {
     return new CronJob("*/10 * * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
 
-        if (count == 0) {
+        if (count === 0) {
             weatherData = await getWeatherWarnings();
 
             countTotal = 2;
