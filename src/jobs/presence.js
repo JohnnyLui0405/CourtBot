@@ -16,7 +16,7 @@ const getWeatherWarnings = async () => {
 
 let count = 0;
 let countTotal = 2;
-let weatherData = getWeatherWarnings();
+let weatherData = null;
 export const action = async (client) => {
     return new CronJob("*/10 * * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
