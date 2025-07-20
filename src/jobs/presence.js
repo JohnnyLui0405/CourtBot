@@ -33,9 +33,14 @@ export const action = async (client) => {
 
             await client.user.setActivity(currentTime, { type: ActivityType.Listening });
         } else if (count === 1) {
-            const uvIndex = weatherData.uvindex.data[0].value;
+            const uvIndex = (weatherData.uvindex && Array.isArray(weatherData.uvindex.data) && weatherData.uvindex.data.length > 0)
+                ? weatherData.uvindex.data[0].value
+                : "N/A";
             const temperature = weatherData.temperature.data[0].value;
             const humidity = weatherData.humidity.data[0].value;
+            if (uvIndex === "N/A") {
+                logger.warn("UV Index data is missing or invalid.");
+            }
             await client.user.setActivity(`溫度: ${temperature}°C | 濕度: ${humidity}% | UV: ${uvIndex}`, { type: ActivityType.Listening });
             logger.info(`UV Index: ${uvIndex} | Temperature: ${temperature}°C | Humidity: ${humidity}%`);
         } else {
