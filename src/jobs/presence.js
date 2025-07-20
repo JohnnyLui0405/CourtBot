@@ -32,7 +32,7 @@ export const action = async (client) => {
             logger.info(`Current time: ${currentTime}`);
 
             await client.user.setActivity(currentTime, { type: ActivityType.Listening });
-        } else if (count == 1) {
+        } else if (count === 1) {
             const uvIndex = weatherData.uvindex.data[0].value;
             const temperature = weatherData.temperature.data[0].value;
             const humidity = weatherData.humidity.data[0].value;
