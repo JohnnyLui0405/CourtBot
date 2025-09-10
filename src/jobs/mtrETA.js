@@ -9,7 +9,7 @@ export const job = {
 };
 
 export const action = async (client) => {
-    return new CronJob("*/10 * * * * *", async () => {
+    return new CronJob("* * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
 
         const staDict = {

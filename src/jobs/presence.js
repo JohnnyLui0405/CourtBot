@@ -18,7 +18,7 @@ let presenceIndex = 0;
 let maxPresenceIndex = 2;
 let weatherData = null;
 export const action = async (client) => {
-    return new CronJob("*/10 * * * * *", async () => {
+    return new CronJob("* * * * *", async () => {
         logger.info(`Running ${job.name} job...`);
 
         if (presenceIndex === 0) {
