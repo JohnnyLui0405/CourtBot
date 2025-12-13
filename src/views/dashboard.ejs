@@ -3,112 +3,1087 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>URL Shortener - Dashboard</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        animation: {
-                            "fade-up": "fadeUp 0.5s ease-in",
-                        },
-                        keyframes: {
-                            fadeUp: {
-                                "0%": { opacity: "0", transform: "translateY(20px)" },
-                                "100%": { opacity: "1", transform: "translateY(0)" },
-                            },
-                        },
-                    },
-                },
-            };
-        </script>
+        <title>SHORTURL.SYS // Command Center</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+        <style>
+            :root {
+                --terminal-black: #000000;
+                --phosphor-green: #00ff41;
+                --phosphor-dim: #00cc33;
+                --phosphor-bright: #33ff66;
+                --phosphor-glow: rgba(0, 255, 65, 0.4);
+                --amber: #ffb000;
+                --red: #ff3333;
+                --cyan: #00ffff;
+                --scan-line: rgba(0, 255, 65, 0.03);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            @keyframes flicker {
+                0%, 100% { opacity: 1; }
+                92% { opacity: 1; }
+                93% { opacity: 0.85; }
+                94% { opacity: 1; }
+                97% { opacity: 0.92; }
+            }
+
+            @keyframes scanline {
+                0% { transform: translateY(-100%); }
+                100% { transform: translateY(100vh); }
+            }
+
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
+            @keyframes textGlow {
+                0%, 100% { text-shadow: 0 0 10px var(--phosphor-glow); }
+                50% { text-shadow: 0 0 5px var(--phosphor-glow), 0 0 15px var(--phosphor-glow); }
+            }
+
+            @keyframes cursorBlink {
+                0%, 49% { background-color: var(--phosphor-green); }
+                50%, 100% { background-color: transparent; }
+            }
+
+            @keyframes slideIn {
+                0% { opacity: 0; transform: translateY(10px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes chromatic {
+                0% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+                25% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+                50% { text-shadow: -1px 0 #ff0000, 1px 0 #00ffff; }
+                75% { text-shadow: 1px 0 #ff0000, -1px 0 #00ffff; }
+                100% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 0.5; }
+                50% { opacity: 1; }
+            }
+
+            @keyframes typing {
+                from { width: 0; }
+                to { width: 100%; }
+            }
+
+            body {
+                font-family: "JetBrains Mono", monospace;
+                background-color: var(--terminal-black);
+                min-height: 100vh;
+                color: var(--phosphor-green);
+                position: relative;
+                overflow-x: hidden;
+                animation: flicker 4s infinite;
+            }
+
+            /* CRT Screen Curvature */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 70%, rgba(0, 0, 0, 0.6) 100%);
+                pointer-events: none;
+                z-index: 1000;
+            }
+
+            /* Scanline overlay */
+            body::after {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    var(--scan-line) 2px,
+                    var(--scan-line) 4px
+                );
+                pointer-events: none;
+                z-index: 1001;
+            }
+
+            /* Moving scanline */
+            .scanline-moving {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 8px;
+                background: linear-gradient(to bottom, transparent, var(--phosphor-glow), transparent);
+                animation: scanline 8s linear infinite;
+                pointer-events: none;
+                z-index: 1002;
+                opacity: 0.5;
+            }
+
+            /* Screen edge glow */
+            .screen-glow {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: inset 0 0 150px rgba(0, 255, 65, 0.08);
+                pointer-events: none;
+                z-index: 999;
+            }
+
+            /* Header */
+            .header {
+                padding: 20px 40px;
+                border-bottom: 1px solid var(--phosphor-dim);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: rgba(0, 10, 0, 0.8);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .logo-box {
+                width: 40px;
+                height: 40px;
+                border: 2px solid var(--phosphor-green);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: 700;
+                box-shadow: 0 0 10px var(--phosphor-glow);
+            }
+
+            .logo-text {
+                font-size: 14px;
+                font-weight: 700;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+
+            .logo-text span {
+                display: block;
+                font-size: 10px;
+                font-weight: 400;
+                color: var(--phosphor-dim);
+                letter-spacing: 1px;
+            }
+
+            .system-status {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 11px;
+                color: var(--phosphor-dim);
+            }
+
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                background: var(--phosphor-green);
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+                box-shadow: 0 0 10px var(--phosphor-glow);
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
+            .user-info {
+                font-size: 12px;
+                text-align: right;
+            }
+
+            .user-label {
+                color: var(--phosphor-dim);
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .user-name {
+                color: var(--phosphor-bright);
+                font-weight: 500;
+            }
+
+            .logout-btn {
+                background: transparent;
+                border: 1px solid var(--phosphor-green);
+                color: var(--phosphor-green);
+                padding: 8px 16px;
+                font-family: inherit;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .logout-btn:hover {
+                background: var(--phosphor-green);
+                color: var(--terminal-black);
+                box-shadow: 0 0 20px var(--phosphor-glow);
+                animation: chromatic 0.1s infinite;
+            }
+
+            /* Main container */
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 40px;
+            }
+
+            /* Terminal panels */
+            .panel-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 24px;
+                margin-bottom: 24px;
+            }
+
+            .panel {
+                background: rgba(0, 10, 0, 0.9);
+                border: 1px solid var(--phosphor-dim);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .panel::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--phosphor-green), transparent);
+            }
+
+            .panel-header {
+                background: rgba(0, 255, 65, 0.1);
+                border-bottom: 1px solid var(--phosphor-dim);
+                padding: 12px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .panel-title {
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .panel-title::before {
+                content: ">";
+                color: var(--phosphor-bright);
+            }
+
+            .panel-status {
+                font-size: 10px;
+                color: var(--phosphor-dim);
+            }
+
+            .panel-content {
+                padding: 24px;
+            }
+
+            /* Create URL Panel */
+            .create-panel {
+                grid-column: span 1;
+            }
+
+            .command-line {
+                margin-bottom: 20px;
+                font-size: 12px;
+                color: var(--phosphor-dim);
+            }
+
+            .command-line .prompt {
+                color: var(--phosphor-bright);
+            }
+
+            .command-line .cmd {
+                color: var(--amber);
+            }
+
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+            .input-label {
+                display: block;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 8px;
+                color: var(--phosphor-dim);
+            }
+
+            .url-input {
+                width: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                border: 1px solid var(--phosphor-dim);
+                color: var(--phosphor-green);
+                padding: 16px;
+                font-family: inherit;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .url-input::placeholder {
+                color: rgba(0, 255, 65, 0.3);
+            }
+
+            .url-input:focus {
+                outline: none;
+                border-color: var(--phosphor-green);
+                box-shadow: 0 0 20px var(--phosphor-glow), inset 0 0 20px rgba(0, 255, 65, 0.05);
+            }
+
+            .submit-btn {
+                background: transparent;
+                border: 2px solid var(--phosphor-green);
+                color: var(--phosphor-green);
+                padding: 14px 28px;
+                font-family: inherit;
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .submit-btn::before {
+                content: ">";
+                font-weight: 400;
+            }
+
+            .submit-btn:hover {
+                background: var(--phosphor-green);
+                color: var(--terminal-black);
+                box-shadow: 0 0 30px var(--phosphor-glow);
+                animation: chromatic 0.1s infinite;
+            }
+
+            .submit-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            /* Stats Panel */
+            .stats-panel {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stat-box {
+                border: 1px dashed var(--phosphor-dim);
+                padding: 20px;
+                text-align: center;
+            }
+
+            .stat-value {
+                font-size: 48px;
+                font-weight: 700;
+                line-height: 1;
+                color: var(--phosphor-bright);
+                text-shadow: 0 0 20px var(--phosphor-glow);
+                animation: textGlow 3s ease-in-out infinite;
+            }
+
+            .stat-label {
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: var(--phosphor-dim);
+                margin-top: 8px;
+            }
+
+            .stat-bar {
+                height: 4px;
+                background: rgba(0, 255, 65, 0.1);
+                margin-top: 16px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stat-bar-fill {
+                height: 100%;
+                background: var(--phosphor-green);
+                box-shadow: 0 0 10px var(--phosphor-glow);
+                transition: width 1s ease;
+            }
+
+            /* ASCII decoration */
+            .ascii-decoration {
+                font-size: 10px;
+                color: var(--phosphor-dim);
+                opacity: 0.5;
+                text-align: center;
+                margin-top: 16px;
+                white-space: pre;
+            }
+
+            /* URL List Panel */
+            .urls-panel {
+                grid-column: span 2;
+            }
+
+            .url-list {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .url-item {
+                display: grid;
+                grid-template-columns: 1fr auto auto auto;
+                align-items: center;
+                gap: 24px;
+                padding: 16px 20px;
+                background: rgba(0, 0, 0, 0.3);
+                border-left: 3px solid transparent;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .url-item::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: var(--phosphor-green);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .url-item:hover {
+                background: rgba(0, 255, 65, 0.05);
+            }
+
+            .url-item:hover::before {
+                opacity: 1;
+            }
+
+            .url-item:hover .url-short {
+                animation: chromatic 0.1s infinite;
+            }
+
+            .url-info {
+                min-width: 0;
+            }
+
+            .url-short {
+                font-weight: 500;
+                font-size: 14px;
+                color: var(--phosphor-bright);
+                margin-bottom: 4px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .url-short::before {
+                content: "→";
+                color: var(--phosphor-dim);
+            }
+
+            .url-original {
+                font-size: 11px;
+                color: var(--phosphor-dim);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .url-clicks {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 12px;
+                color: var(--cyan);
+                padding: 6px 12px;
+                border: 1px solid var(--cyan);
+                opacity: 0.7;
+            }
+
+            .url-clicks svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                stroke-width: 2;
+                fill: none;
+            }
+
+            .copy-btn {
+                background: transparent;
+                border: 1px solid var(--phosphor-green);
+                color: var(--phosphor-green);
+                padding: 8px 16px;
+                font-family: inherit;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .copy-btn svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                stroke-width: 2;
+                fill: none;
+            }
+
+            .copy-btn:hover {
+                background: var(--phosphor-green);
+                color: var(--terminal-black);
+                box-shadow: 0 0 15px var(--phosphor-glow);
+            }
+
+            .copy-btn.copied {
+                border-color: var(--cyan);
+                color: var(--cyan);
+                background: rgba(0, 255, 255, 0.1);
+            }
+
+            /* Empty state */
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+                color: var(--phosphor-dim);
+            }
+
+            .empty-ascii {
+                font-size: 12px;
+                margin-bottom: 20px;
+                white-space: pre;
+                line-height: 1.2;
+            }
+
+            .empty-text {
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            /* Pagination */
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 16px;
+                margin-top: 24px;
+                padding-top: 24px;
+                border-top: 1px dashed var(--phosphor-dim);
+            }
+
+            .page-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 20px;
+                background: transparent;
+                border: 1px solid var(--phosphor-dim);
+                color: var(--phosphor-green);
+                font-family: inherit;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .page-btn:hover:not(.disabled) {
+                border-color: var(--phosphor-green);
+                box-shadow: 0 0 15px var(--phosphor-glow);
+            }
+
+            .page-btn.disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .page-btn svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                stroke-width: 2;
+                fill: none;
+            }
+
+            .page-info {
+                font-size: 11px;
+                color: var(--phosphor-dim);
+                padding: 0 16px;
+                border-left: 1px solid var(--phosphor-dim);
+                border-right: 1px solid var(--phosphor-dim);
+            }
+
+            /* Footer terminal output */
+            .footer-output {
+                margin-top: 40px;
+                padding: 20px;
+                border: 1px dashed var(--phosphor-dim);
+                font-size: 10px;
+                color: var(--phosphor-dim);
+            }
+
+            .footer-line {
+                margin-bottom: 4px;
+            }
+
+            .footer-line .dim { opacity: 0.5; }
+            .footer-line .success { color: var(--phosphor-green); }
+
+            /* Responsive */
+            @media (max-width: 1024px) {
+                .panel-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .urls-panel {
+                    grid-column: span 1;
+                }
+
+                .main-container {
+                    padding: 20px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .header {
+                    flex-direction: column;
+                    gap: 16px;
+                    padding: 16px 20px;
+                }
+
+                .header-left, .header-right {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .url-item {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                }
+
+                .url-clicks, .copy-btn {
+                    justify-self: start;
+                }
+
+                .pagination {
+                    flex-wrap: wrap;
+                }
+            }
+
+            /* Loading animation */
+            .loading {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 2px solid var(--phosphor-dim);
+                border-top-color: var(--phosphor-green);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
     </head>
-    <body class="bg-gray-100 min-h-screen">
-        <nav class="bg-white shadow-md p-4 animate-fade-up">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold">URL Shortener</h1>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Welcome, <%= user.username %></span>
-                    <button id="logout" class="text-gray-600 hover:text-gray-800">Logout</button>
+    <body>
+        <div class="scanline-moving"></div>
+        <div class="screen-glow"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-box">>_</div>
+                    <div class="logo-text">
+                        SHORTURL.SYS
+                        <span>v2.0.4 // Command Center</span>
+                    </div>
+                </div>
+                <div class="system-status">
+                    <div class="status-dot"></div>
+                    <span>SYSTEM ONLINE</span>
                 </div>
             </div>
-        </nav>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-label">Authenticated User</div>
+                    <div class="user-name"><%= user.username %></div>
+                </div>
+                <button id="logout" class="logout-btn" onclick="playBeep()">DISCONNECT</button>
+            </div>
+        </header>
 
-        <main class="max-w-7xl mx-auto p-6">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6 animate-fade-up">
-                <h2 class="text-lg font-semibold mb-4">Create Short URL</h2>
-                <form id="shortenForm" class="space-y-4" action="/shorten" method="POST">
-                    <div>
-                        <input type="url" name="originalUrl" placeholder="Enter your URL here" class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+        <!-- Main content -->
+        <main class="main-container">
+            <!-- Top panels -->
+            <div class="panel-grid">
+                <!-- Create URL Panel -->
+                <div class="panel create-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">New URL Entry</div>
+                        <div class="panel-status">READY</div>
                     </div>
-                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Shorten URL</button>
-                </form>
+                    <div class="panel-content">
+                        <div class="command-line">
+                            <span class="prompt">user@shorturl:~$</span> <span class="cmd">shorturl --create</span> <span class="typewriter-cursor">█</span>
+                        </div>
+                        <form id="shortenForm" action="/shorten" method="POST">
+                            <div class="input-group">
+                                <label class="input-label">Target URL</label>
+                                <input type="url" name="originalUrl" class="url-input" placeholder="https://example.com/your-long-url-here..." required onfocus="playBeep()" />
+                            </div>
+                            <button type="submit" class="submit-btn" onclick="playBeep()">
+                                Execute Compression
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="panel stats-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">System Stats</div>
+                        <div class="panel-status" id="datetime"></div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value"><%= totalUrls %></div>
+                                <div class="stat-label">Total Compressed URLs</div>
+                                <div class="stat-bar">
+                                    <div class="stat-bar-fill" style="width: <%= Math.min(totalUrls * 2, 100) %>%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ascii-decoration">
+    ╔══════════════════╗
+    ║  MEMORY: 64KB    ║
+    ║  CPU: 100% OK    ║
+    ║  DISK: OPTIMAL   ║
+    ╚══════════════════╝
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6 animate-fade-up">
-                <h2 class="text-lg font-semibold mb-4">Your Short URLs</h2>
-                <div id="urlList" class="space-y-4">
-                    <% if (urls && urls.length > 0) { %> <% urls.slice((page - 1) * perPage, page * perPage).forEach(url => { %>
-                    <div class="flex items-center justify-between p-3 border rounded-md animate-fade-up">
-                        <div class="max-w-[75%]">
-                            <p class="text-sm text-gray-600 truncate">Original: <%= url.original %></p>
-                            <p class="font-medium truncate">Short: <%= url.shortURL %></p>
-                            <p class="text-sm text-gray-500 truncate">Clicks: <%= url.clicks %></p>
+            <!-- URL List Panel -->
+            <div class="panel urls-panel">
+                <div class="panel-header">
+                    <div class="panel-title">URL Database</div>
+                    <div class="panel-status"><%= totalUrls %> RECORDS</div>
+                </div>
+                <div class="panel-content">
+                    <% if (urls && urls.length > 0) { %>
+                    <div class="url-list">
+                        <% urls.slice((page - 1) * perPage, page * perPage).forEach((url, index) => { %>
+                        <div class="url-item" style="animation: slideIn 0.3s ease forwards; animation-delay: <%= index * 0.05 %>s; opacity: 0;">
+                            <div class="url-info">
+                                <div class="url-short"><%= url.shortURL %></div>
+                                <div class="url-original"><%= url.original %></div>
+                            </div>
+                            <div class="url-clicks">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <%= url.clicks %>
+                            </div>
+                            <button class="copy-btn" data-url="<%= url.shortURL %>" onclick="playBeep()">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                COPY
+                            </button>
                         </div>
-                        <button class="text-indigo-600 hover:text-indigo-800 copy-btn" data-url="<%= url.shortURL %>">Copy</button>
+                        <% }); %>
                     </div>
-                    <% }); %>
-                    <!-- Pagination Controls -->
-                    <div class="flex justify-between items-center mt-4">
-                        <a href="?page=<%= page > 1 ? page - 1 : 1 %>" class="px-4 py-2 bg-gray-200 rounded-md <%= page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"> Previous </a>
-                        <span class="text-gray-600"> Page <%= page %> of <%= Math.ceil(totalUrls / perPage) %> </span>
-                        <a
-                            href="?page=<%= page < Math.ceil(totalUrls / perPage) ? page + 1 : Math.ceil(totalUrls / perPage) %>"
-                            class="px-4 py-2 bg-gray-200 rounded-md <%= page === Math.ceil(totalUrls / perPage) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"
-                        >
-                            Next
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <a href="?page=<%= page > 1 ? page - 1 : 1 %>" class="page-btn <%= page === 1 ? 'disabled' : '' %>" onclick="playBeep()">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                            PREV
+                        </a>
+                        <span class="page-info">
+                            PAGE <span style="color: var(--phosphor-bright);"><%= page %></span> OF <span style="color: var(--phosphor-bright);"><%= Math.ceil(totalUrls / perPage) || 1 %></span>
+                        </span>
+                        <a href="?page=<%= page < Math.ceil(totalUrls / perPage) ? page + 1 : Math.ceil(totalUrls / perPage) %>" 
+                           class="page-btn <%= page >= Math.ceil(totalUrls / perPage) ? 'disabled' : '' %>" onclick="playBeep()">
+                            NEXT
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
                         </a>
                     </div>
                     <% } else { %>
-                    <p class="text-gray-500 text-center">No URLs shortened yet</p>
+                    <div class="empty-state">
+                        <div class="empty-ascii">
+    ┌─────────────────────────────────┐
+    │                                 │
+    │   NO DATA FOUND IN DATABASE     │
+    │                                 │
+    │   > Run shorturl --create       │
+    │   > To add your first entry     │
+    │                                 │
+    └─────────────────────────────────┘
+                        </div>
+                        <p class="empty-text">Awaiting first URL compression...</p>
+                    </div>
                     <% } %>
                 </div>
+            </div>
+
+            <!-- Footer output -->
+            <div class="footer-output">
+                <div class="footer-line"><span class="dim">[LOG]</span> <span class="success">Session authenticated via Discord OAuth2</span></div>
+                <div class="footer-line"><span class="dim">[LOG]</span> Database connection: <span class="success">ACTIVE</span></div>
+                <div class="footer-line"><span class="dim">[LOG]</span> Compression engine: <span class="success">READY</span></div>
+                <div class="footer-line"><span class="dim">[SYS]</span> Crafted by JOHNNNNY // All systems nominal_</div>
             </div>
         </main>
 
         <script>
-            // Form submission handling
+            // Update datetime
+            function updateDateTime() {
+                const now = new Date();
+                const formatted = now.toISOString().slice(11, 19);
+                document.getElementById('datetime').textContent = formatted;
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Beep sound
+            function playBeep() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'square';
+                    gainNode.gain.value = 0.08;
+                    
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 80);
+                } catch (e) {}
+            }
+
+            // Hover beep
+            document.querySelectorAll('a, button, .url-item').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        
+                        oscillator.frequency.value = 600;
+                        oscillator.type = 'sine';
+                        gainNode.gain.value = 0.02;
+                        
+                        oscillator.start();
+                        setTimeout(() => oscillator.stop(), 40);
+                    } catch (e) {}
+                });
+            });
+
+            // Form submission
             document.getElementById("shortenForm").addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const form = e.target;
-                const response = await fetch(form.action, {
-                    method: "POST",
-                    body: JSON.stringify({ originalUrl: form.originalUrl.value }),
-                    headers: { "Content-Type": "application/json" },
-                });
-                if (response.ok) {
-                    alert("URL shortened successfully!");
-                    window.location.reload();
-                } else {
-                    alert(await response.text());
+                const btn = form.querySelector(".submit-btn");
+                const originalText = btn.innerHTML;
+
+                btn.innerHTML = '<span class="loading"></span> PROCESSING...';
+                btn.disabled = true;
+
+                // Processing beeps
+                let beepCount = 0;
+                const beepInterval = setInterval(() => {
+                    if (beepCount < 5) {
+                        try {
+                            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            const oscillator = audioCtx.createOscillator();
+                            const gainNode = audioCtx.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            oscillator.frequency.value = 440 + (beepCount * 100);
+                            oscillator.type = 'square';
+                            gainNode.gain.value = 0.03;
+                            oscillator.start();
+                            setTimeout(() => oscillator.stop(), 50);
+                        } catch (e) {}
+                        beepCount++;
+                    }
+                }, 200);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: "POST",
+                        body: JSON.stringify({ originalUrl: form.originalUrl.value }),
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    
+                    clearInterval(beepInterval);
+                    
+                    if (response.ok) {
+                        // Success beep
+                        try {
+                            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            const oscillator = audioCtx.createOscillator();
+                            const gainNode = audioCtx.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            oscillator.frequency.value = 1000;
+                            oscillator.type = 'square';
+                            gainNode.gain.value = 0.1;
+                            oscillator.start();
+                            setTimeout(() => oscillator.stop(), 200);
+                        } catch (e) {}
+                        window.location.reload();
+                    } else {
+                        alert(await response.text());
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    clearInterval(beepInterval);
+                    alert("ERROR: Connection failed. Please try again.");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
             });
 
-            // Logout handling
+            // Logout
             document.getElementById("logout").addEventListener("click", async () => {
                 await fetch("/auth/logout", { method: "POST" });
                 window.location.href = "/";
             });
 
-            // Copy button handling
+            // Copy buttons
             document.querySelectorAll(".copy-btn").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     const url = btn.dataset.url;
                     navigator.clipboard.writeText(url);
-                    btn.textContent = "Copied!";
-                    setTimeout(() => (btn.textContent = "Copy"), 2000);
+                    btn.classList.add("copied");
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                        COPIED!
+                    `;
+                    
+                    // Success beep sequence
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        [600, 800].forEach((freq, i) => {
+                            setTimeout(() => {
+                                const osc = audioCtx.createOscillator();
+                                const gain = audioCtx.createGain();
+                                osc.connect(gain);
+                                gain.connect(audioCtx.destination);
+                                osc.frequency.value = freq;
+                                osc.type = 'square';
+                                gain.gain.value = 0.05;
+                                osc.start();
+                                setTimeout(() => osc.stop(), 100);
+                            }, i * 100);
+                        });
+                    } catch (e) {}
+                    
+                    setTimeout(() => {
+                        btn.classList.remove("copied");
+                        btn.innerHTML = `
+                            <svg viewBox="0 0 24 24">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            COPY
+                        `;
+                    }, 2000);
                 });
             });
+
+            // Add typewriter cursor blink
+            const cursor = document.querySelector('.typewriter-cursor');
+            if (cursor) {
+                setInterval(() => {
+                    cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+                }, 500);
+            }
         </script>
     </body>
 </html>
+

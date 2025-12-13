@@ -3,50 +3,748 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>URL Shortener - Dashboard</title>
-        <meta name="description" content="A simple URL shortening service with Discord login" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="URL Shortener Dashboard" />
-        <meta name="twitter:description" content="Shorten your URLs and track clicks with our easy-to-use service" />
-        <meta name="twitter:creator" content="@YourTwitterHandle" />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        animation: {
-                            "fade-up": "fadeUp 0.5s ease-in",
-                        },
-                        keyframes: {
-                            fadeUp: {
-                                "0%": { opacity: "0", transform: "translateY(20px)" },
-                                "100%": { opacity: "1", transform: "translateY(0)" },
-                            },
-                        },
-                    },
-                },
-            };
-        </script>
-    </head>
-    <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md animate-fade-up">
-            <h1 class="text-2xl font-bold text-center mb-6">URL Shortener</h1>
-            <p class="text-gray-600 text-center mb-8">Sign in to start shortening URLs</p>
+        <title>SHORTURL.SYS // Terminal Access</title>
+        <meta name="description" content="SECURE URL SHORTENING SYSTEM - TERMINAL ACCESS REQUIRED" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+        <style>
+            :root {
+                --terminal-black: #000000;
+                --phosphor-green: #00ff41;
+                --phosphor-dim: #00cc33;
+                --phosphor-bright: #33ff66;
+                --phosphor-glow: rgba(0, 255, 65, 0.4);
+                --amber: #ffb000;
+                --scan-line: rgba(0, 255, 65, 0.03);
+            }
 
-            <div class="flex justify-center">
-                <a
-                    href="https://discord.com/oauth2/authorize?client_id=746284182862299226&response_type=code&redirect_uri=<%= redirect_uri %>&scope=identify+email"
-                    class="flex items-center bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" fill="currentColor" class="bi bi-discord" viewBox="0 0 16 16">
-                        <path
-                            d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"
-                        />
-                    </svg>
-                    Login with Discord
-                </a>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            @keyframes flicker {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                92% {
+                    opacity: 1;
+                }
+                93% {
+                    opacity: 0.8;
+                }
+                94% {
+                    opacity: 1;
+                }
+                97% {
+                    opacity: 0.9;
+                }
+            }
+
+            @keyframes scanline {
+                0% {
+                    transform: translateY(-100%);
+                }
+                100% {
+                    transform: translateY(100vh);
+                }
+            }
+
+            @keyframes blink {
+                0%,
+                50% {
+                    opacity: 1;
+                }
+                51%,
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            @keyframes textGlow {
+                0%,
+                100% {
+                    text-shadow: 0 0 10px var(--phosphor-glow), 0 0 20px var(--phosphor-glow), 0 0 30px var(--phosphor-glow);
+                }
+                50% {
+                    text-shadow: 0 0 5px var(--phosphor-glow), 0 0 10px var(--phosphor-glow), 0 0 15px var(--phosphor-glow);
+                }
+            }
+
+            @keyframes bootSequence {
+                0% {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes cursorBlink {
+                0%,
+                49% {
+                    background-color: var(--phosphor-green);
+                }
+                50%,
+                100% {
+                    background-color: transparent;
+                }
+            }
+
+            body {
+                font-family: "JetBrains Mono", monospace;
+                background-color: var(--terminal-black);
+                min-height: 100vh;
+                color: var(--phosphor-green);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+                animation: flicker 4s infinite;
+            }
+
+            /* CRT Screen Curvature */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 80%, rgba(0, 0, 0, 0.8) 100%);
+                pointer-events: none;
+                z-index: 1000;
+            }
+
+            /* Scanline overlay */
+            body::after {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scan-line) 2px, var(--scan-line) 4px);
+                pointer-events: none;
+                z-index: 1001;
+            }
+
+            /* Moving scanline */
+            .scanline-moving {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 8px;
+                background: linear-gradient(to bottom, transparent, var(--phosphor-glow), transparent);
+                animation: scanline 8s linear infinite;
+                pointer-events: none;
+                z-index: 1002;
+                opacity: 0.5;
+            }
+
+            /* Screen edge glow */
+            .screen-glow {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: inset 0 0 150px rgba(0, 255, 65, 0.1), inset 0 0 100px rgba(0, 0, 0, 0.5);
+                pointer-events: none;
+                z-index: 999;
+                border-radius: 20px;
+            }
+
+            /* ASCII Art Background */
+            .ascii-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                opacity: 0.03;
+                font-size: 10px;
+                line-height: 1.2;
+                color: var(--phosphor-green);
+                pointer-events: none;
+                z-index: -1;
+                white-space: pre;
+                font-family: "JetBrains Mono", monospace;
+            }
+
+            /* Main terminal container */
+            .terminal-container {
+                position: relative;
+                z-index: 10;
+                max-width: 700px;
+                width: 95vw;
+            }
+
+            .terminal-window {
+                background: rgba(0, 10, 0, 0.9);
+                border: 2px solid var(--phosphor-green);
+                border-radius: 8px;
+                box-shadow: 0 0 20px var(--phosphor-glow), 0 0 40px rgba(0, 255, 65, 0.2), inset 0 0 60px rgba(0, 255, 65, 0.05);
+                overflow: hidden;
+            }
+
+            /* Terminal title bar */
+            .terminal-titlebar {
+                background: var(--phosphor-green);
+                color: var(--terminal-black);
+                padding: 8px 16px;
+                font-size: 12px;
+                font-weight: 700;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            .terminal-titlebar-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .terminal-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: var(--terminal-black);
+            }
+
+            .terminal-titlebar-right {
+                font-size: 10px;
+                opacity: 0.7;
+            }
+
+            /* Terminal content */
+            .terminal-content {
+                padding: 32px;
+            }
+
+            /* ASCII Art Logo */
+            .ascii-logo {
+                font-size: 8px;
+                line-height: 1.1;
+                text-align: center;
+                margin-bottom: 24px;
+                color: var(--phosphor-green);
+                animation: textGlow 3s ease-in-out infinite;
+                white-space: pre;
+            }
+
+            /* Boot sequence text */
+            .boot-text {
+                font-size: 11px;
+                line-height: 1.8;
+                margin-bottom: 24px;
+                opacity: 0;
+            }
+
+            .boot-text.visible {
+                animation: bootSequence 0.5s ease forwards;
+            }
+
+            .boot-line {
+                display: block;
+            }
+
+            .success {
+                color: var(--phosphor-green);
+            }
+            .warning {
+                color: var(--amber);
+            }
+            .dim {
+                opacity: 0.5;
+            }
+
+            /* Command prompt */
+            .command-prompt {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 32px;
+                font-size: 14px;
+            }
+
+            .prompt-symbol {
+                color: var(--phosphor-bright);
+                font-weight: 700;
+            }
+
+            .prompt-path {
+                color: var(--phosphor-dim);
+            }
+
+            .prompt-command {
+                color: var(--phosphor-green);
+                position: relative;
+            }
+
+            .prompt-command::after {
+                content: "█";
+                animation: cursorBlink 1s infinite;
+                margin-left: 2px;
+            }
+
+            /* Typewriter effect container */
+            .typewriter {
+                overflow: hidden;
+                display: inline-block;
+            }
+
+            .typewriter-text {
+                display: inline-block;
+            }
+
+            /* System info box */
+            .system-info {
+                border: 1px solid var(--phosphor-dim);
+                padding: 16px;
+                margin-bottom: 32px;
+                font-size: 11px;
+                background: rgba(0, 255, 65, 0.02);
+            }
+
+            .system-info-header {
+                border-bottom: 1px solid var(--phosphor-dim);
+                padding-bottom: 8px;
+                margin-bottom: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            .system-info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 4px;
+            }
+
+            .system-info-label {
+                color: var(--phosphor-dim);
+            }
+
+            .system-info-value {
+                color: var(--phosphor-bright);
+            }
+
+            /* Login button */
+            .login-btn {
+                display: block;
+                width: 100%;
+                background: transparent;
+                border: 2px solid var(--phosphor-green);
+                color: var(--phosphor-green);
+                padding: 16px 24px;
+                font-family: inherit;
+                font-size: 14px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                cursor: pointer;
+                text-decoration: none;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .login-btn::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--phosphor-green);
+                transition: left 0.3s ease;
+                z-index: -1;
+            }
+
+            .login-btn:hover {
+                color: var(--terminal-black);
+                text-shadow: none;
+                box-shadow: 0 0 30px var(--phosphor-glow), 0 0 60px var(--phosphor-glow);
+                /* Chromatic aberration on hover */
+                animation: chromatic 0.1s infinite;
+            }
+
+            .login-btn:hover::before {
+                left: 0;
+            }
+
+            @keyframes chromatic {
+                0% {
+                    text-shadow: -2px 0 #ff0000, 2px 0 #00ffff;
+                }
+                25% {
+                    text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+                }
+                50% {
+                    text-shadow: -1px 0 #ff0000, 1px 0 #00ffff;
+                }
+                75% {
+                    text-shadow: 1px 0 #ff0000, -1px 0 #00ffff;
+                }
+                100% {
+                    text-shadow: -2px 0 #ff0000, 2px 0 #00ffff;
+                }
+            }
+
+            .login-btn-content {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .login-btn svg {
+                width: 20px;
+                height: 20px;
+                fill: currentColor;
+            }
+
+            /* Footer */
+            .terminal-footer {
+                margin-top: 24px;
+                padding-top: 16px;
+                border-top: 1px dashed var(--phosphor-dim);
+                font-size: 10px;
+                text-align: center;
+                color: var(--phosphor-dim);
+            }
+
+            .terminal-footer a {
+                color: var(--phosphor-green);
+                text-decoration: none;
+            }
+
+            .terminal-footer a:hover {
+                text-decoration: underline;
+            }
+
+            /* Decorative corners */
+            .corner {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                border-color: var(--phosphor-green);
+                border-style: solid;
+                opacity: 0.5;
+            }
+
+            .corner-tl {
+                top: 20px;
+                left: 20px;
+                border-width: 2px 0 0 2px;
+            }
+            .corner-tr {
+                top: 20px;
+                right: 20px;
+                border-width: 2px 2px 0 0;
+            }
+            .corner-bl {
+                bottom: 20px;
+                left: 20px;
+                border-width: 0 0 2px 2px;
+            }
+            .corner-br {
+                bottom: 20px;
+                right: 20px;
+                border-width: 0 2px 2px 0;
+            }
+
+            /* Matrix rain effect */
+            .matrix-column {
+                position: fixed;
+                top: -100%;
+                font-size: 14px;
+                line-height: 1;
+                color: var(--phosphor-green);
+                opacity: 0.1;
+                pointer-events: none;
+                z-index: -1;
+                animation: matrix-fall linear infinite;
+                white-space: nowrap;
+            }
+
+            @keyframes matrix-fall {
+                0% {
+                    transform: translateY(-100%);
+                }
+                100% {
+                    transform: translateY(100vh);
+                }
+            }
+
+            /* Responsive */
+            @media (max-width: 600px) {
+                .terminal-content {
+                    padding: 20px;
+                }
+
+                .ascii-logo {
+                    font-size: 5px;
+                }
+
+                .login-btn {
+                    font-size: 12px;
+                    padding: 14px 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="scanline-moving"></div>
+        <div class="screen-glow"></div>
+
+        <!-- Decorative corners -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <!-- ASCII Background -->
+        <div class="ascii-bg" id="asciiBg"></div>
+
+        <!-- Matrix rain columns -->
+        <div id="matrixRain"></div>
+
+        <!-- Main Terminal -->
+        <div class="terminal-container">
+            <div class="terminal-window">
+                <div class="terminal-titlebar">
+                    <div class="terminal-titlebar-left">
+                        <div class="terminal-dot"></div>
+                        <span>SHORTURL.SYS v2.0.4</span>
+                    </div>
+                    <div class="terminal-titlebar-right">
+                        <span id="datetime"></span>
+                    </div>
+                </div>
+
+                <div class="terminal-content">
+                    <!-- ASCII Logo -->
+                    <div class="ascii-logo">
+                        ███████╗██╗ ██╗ ██████╗ ██████╗ ████████╗██╗ ██╗██████╗ ██╗ ██╔════╝██║ ██║██╔═══██╗██╔══██╗╚══██╔══╝██║ ██║██╔══██╗██║ ███████╗███████║██║ ██║██████╔╝ ██║ ██║ ██║██████╔╝██║
+                        ╚════██║██╔══██║██║ ██║██╔══██╗ ██║ ██║ ██║██╔══██╗██║ ███████║██║ ██║╚██████╔╝██║ ██║ ██║ ╚██████╔╝██║ ██║███████╗ ╚══════╝╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═╝ ╚═╝ ╚═════╝ ╚═╝ ╚═╝╚══════╝
+                    </div>
+
+                    <!-- Boot sequence -->
+                    <div class="boot-text" id="boot1">
+                        <span class="boot-line dim">[<span id="timestamp1"></span>] BIOS POST complete...</span>
+                    </div>
+                    <div class="boot-text" id="boot2">
+                        <span class="boot-line success">[OK] System initialized</span>
+                    </div>
+                    <div class="boot-text" id="boot3">
+                        <span class="boot-line success">[OK] URL compression engine loaded</span>
+                    </div>
+                    <div class="boot-text" id="boot4">
+                        <span class="boot-line warning">[!!] Authentication required</span>
+                    </div>
+
+                    <!-- System info -->
+                    <div class="system-info boot-text" id="boot5">
+                        <div class="system-info-header">// System Status</div>
+                        <div class="system-info-row">
+                            <span class="system-info-label">PROTOCOL:</span>
+                            <span class="system-info-value">HTTPS/2.0</span>
+                        </div>
+                        <div class="system-info-row">
+                            <span class="system-info-label">ENCRYPTION:</span>
+                            <span class="system-info-value">AES-256-GCM</span>
+                        </div>
+                        <div class="system-info-row">
+                            <span class="system-info-label">AUTH_PROVIDER:</span>
+                            <span class="system-info-value">DISCORD_OAUTH2</span>
+                        </div>
+                        <div class="system-info-row">
+                            <span class="system-info-label">STATUS:</span>
+                            <span class="system-info-value" style="color: var(--amber)">AWAITING_AUTH</span>
+                        </div>
+                    </div>
+
+                    <!-- Command prompt -->
+                    <div class="command-prompt boot-text" id="boot6">
+                        <span class="prompt-symbol">></span>
+                        <span class="prompt-path">shorturl/auth$</span>
+                        <span class="prompt-command typewriter">
+                            <span class="typewriter-text" id="commandText"></span>
+                        </span>
+                    </div>
+
+                    <!-- Login button -->
+                    <a
+                        href="https://discord.com/oauth2/authorize?client_id=746284182862299226&response_type=code&redirect_uri=<%= redirect_uri %>&scope=identify+email"
+                        class="login-btn boot-text"
+                        id="boot7"
+                        onclick="playBeep()"
+                    >
+                        <div class="login-btn-content">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                                <path
+                                    d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019"
+                                />
+                            </svg>
+                            <span>AUTHENTICATE_VIA_DISCORD.exe</span>
+                        </div>
+                    </a>
+
+                    <!-- Footer -->
+                    <div class="terminal-footer boot-text" id="boot8"><span class="dim">// Crafted by </span><a href="#">JOHNNNNY</a><span class="dim"> // All systems nominal</span></div>
+                </div>
             </div>
-            <p class="text-center text-gray-500 text-sm mt-4">By Johnnnny</p>
         </div>
+
+        <!-- Audio for beep sounds -->
+        <audio id="beepSound" preload="auto">
+            <source
+                src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp2Se2hrfIeQkYx+bGJrgH+FhoN9d3N2fH9/fn16eHl7fH1+fn59fHt7fH1+f39/fn18e3t8fX5/f39/fn18fHx9fn5/f39/fn19fX1+fn5/f39/fn19fX5+fn9/f39+fn19fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f39+fn5+fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f39+fn5+fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f39+fn5+fn5+f39/f35+fn5+fn5/f39/fn5+fn5+fn9/f39+fn5+fn5+f39/f35+fn5+fn5/f39/"
+                type="audio/wav"
+            />
+        </audio>
+
+        <script>
+            // Generate ASCII background
+            const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ";
+            const asciiBg = document.getElementById("asciiBg");
+            let bgText = "";
+            for (let i = 0; i < 200; i++) {
+                for (let j = 0; j < 150; j++) {
+                    bgText += chars[Math.floor(Math.random() * chars.length)];
+                }
+                bgText += "\n";
+            }
+            asciiBg.textContent = bgText;
+
+            // Matrix rain effect
+            function createMatrixRain() {
+                const container = document.getElementById("matrixRain");
+                const columns = Math.floor(window.innerWidth / 20);
+
+                for (let i = 0; i < columns; i++) {
+                    const column = document.createElement("div");
+                    column.className = "matrix-column";
+                    column.style.left = i * 20 + "px";
+                    column.style.animationDuration = Math.random() * 10 + 10 + "s";
+                    column.style.animationDelay = Math.random() * 5 + "s";
+
+                    let text = "";
+                    for (let j = 0; j < 50; j++) {
+                        text += chars[Math.floor(Math.random() * chars.length)] + "<br>";
+                    }
+                    column.innerHTML = text;
+                    container.appendChild(column);
+                }
+            }
+            createMatrixRain();
+
+            // Update datetime
+            function updateDateTime() {
+                const now = new Date();
+                const formatted = now.toISOString().slice(0, 19).replace("T", " ");
+                document.getElementById("datetime").textContent = formatted;
+                document.getElementById("timestamp1").textContent = formatted;
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Boot sequence animation
+            const bootElements = ["boot1", "boot2", "boot3", "boot4", "boot5", "boot6", "boot7", "boot8"];
+            bootElements.forEach((id, index) => {
+                setTimeout(() => {
+                    document.getElementById(id).classList.add("visible");
+                    playKeySound();
+                }, 300 + index * 400);
+            });
+
+            // Typewriter effect for command
+            const command = "./authenticate --provider=discord --mode=secure";
+            const commandText = document.getElementById("commandText");
+            let charIndex = 0;
+
+            setTimeout(() => {
+                const typeInterval = setInterval(() => {
+                    if (charIndex < command.length) {
+                        commandText.textContent += command[charIndex];
+                        charIndex++;
+                        playKeySound();
+                    } else {
+                        clearInterval(typeInterval);
+                    }
+                }, 50);
+            }, 2500);
+
+            // Beep sound functions
+            function playBeep() {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = "square";
+                gainNode.gain.value = 0.1;
+
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.stop();
+                }, 100);
+            }
+
+            function playKeySound() {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.frequency.value = 440 + Math.random() * 200;
+                oscillator.type = "square";
+                gainNode.gain.value = 0.02;
+
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.stop();
+                }, 30);
+            }
+
+            // Add click sound to all interactive elements
+            document.querySelectorAll("a, button").forEach((el) => {
+                el.addEventListener("click", playBeep);
+                el.addEventListener("mouseenter", () => {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    oscillator.frequency.value = 600;
+                    oscillator.type = "sine";
+                    gainNode.gain.value = 0.03;
+
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 50);
+                });
+            });
+        </script>
     </body>
 </html>
