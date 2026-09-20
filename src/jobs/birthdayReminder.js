@@ -10,7 +10,7 @@ export const action = async (client) => {
     return new CronJob("0 0 * * *", async () => {
         logger.info(`Running ${job.name} job...`);
 
-        const today = new Date();
+        const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" }));
         const userColleciton = client.db.collection("user");
 
         const users = await userColleciton.find({ $expr: { $and: [{ $eq: [{ $month: "$birthday" }, today.getMonth() + 1] }, { $eq: [{ $dayOfMonth: "$birthday" }, today.getDate()] }] } }).toArray();
@@ -33,5 +33,5 @@ export const action = async (client) => {
         }
 
         logger.info(`${job.name} job Done!`);
-    });
+    }, null, true, "Asia/Hong_Kong");
 };
